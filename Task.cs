@@ -10,12 +10,12 @@ namespace IntroToC_
 {
     public class Task(int id, string name, string description)
     {
-        private int Id { get; } = id;
-        private string Name { get; set; } = name;
-        private string Description { get; set; } = description;
-        private bool IsCompleted { get; set; } = false;
+        public int Id { get; private set; } = id;
+        public string Name { get; set; } = name;
+        public string Description { get; set; } = description;
+        public bool IsCompleted { get; set; } = false;
 
-        public void markCompleted() {
+        public void MarkCompleted() {
             if (IsCompleted == false) IsCompleted = true;
         }
     }

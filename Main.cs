@@ -2,38 +2,37 @@ namespace IntroToC_
 {
     class Program
     {
-        static void Main(String[] args)
+        public static void Main()
         {
-            ToDoList list = new ToDoList();
+            ToDoList list = new();
             bool exit = false;
 
             while (!exit)
             {
-                displayList(list);
+                DisplayList(list);
                 Console.WriteLine("__________________________________________________\n");
-                exit = printPrompt(list);
-                Console.Clear();
+                exit = PrintPrompt(list);
             }
         }
-        public static void displayList(ToDoList list)
+        public static void DisplayList(ToDoList list)
         {
-            if (list.isEmpty())
+            if (list.IsEmpty())
             {
                 Console.WriteLine("No tasks in the list. Try adding some!");
                 return;
             }
 
             Console.WriteLine("Tasks in the list:");
-            foreach (var item in list.GetTasks())
+            foreach (var item in list.Tasks)
             {
-                Console.WriteLine(item.getId() + ". " + item.getName());
-                Console.WriteLine("\t" + item.getDescription());
-                if (item.getIsCompleted()) Console.WriteLine("\tCompleted");
+                Console.WriteLine(item.Id + ". " + item.Name);
+                Console.WriteLine("\t" + item.Description);
+                if (item.IsCompleted) Console.WriteLine("\tCompleted");
                 else Console.WriteLine("\tNot completed\n");
             }
         }
 
-        public static bool printPrompt(ToDoList list)
+        public static bool PrintPrompt(ToDoList list)
         {
             Console.WriteLine("1. Add new task");
             Console.WriteLine("2. Remove a task");
@@ -53,33 +52,33 @@ namespace IntroToC_
 
             switch (choice)
             {
-                case 1: addTaskPrompt(list); break;
-                case 2: removeTaskPrompt(list); break;
-                case 3: updateTaskPrompt(list); break;
-                case 4: markTaskCompletedPrompt(list); break;
-                case 5: list.clearList(); break;
+                case 1: AddTaskPrompt(list); break;
+                case 2: RemoveTaskPrompt(list); break;
+                case 3: UpdateTaskPrompt(list); break;
+                case 4: MarkTaskCompletedPrompt(list); break;
+                case 5: list.ClearList(); break;
                 case 6: return true;
             }
             return false;
         }
 
-        public static void addTaskPrompt(ToDoList list)
+        public static void AddTaskPrompt(ToDoList list)
         {
             Console.WriteLine("Enter task name:");
             string name = Console.ReadLine();
             Console.WriteLine("Enter task description:");
             string description = Console.ReadLine();
-            list.addTask(name, description);
+            list.AddTask(name, description);
         }
 
-        public static void removeTaskPrompt(ToDoList list)
+        public static void RemoveTaskPrompt(ToDoList list)
         {
             Console.WriteLine("Enter task id:");
             int id = Convert.ToInt32(Console.ReadLine());
-            list.removeTask(id);
+            list.RemoveTask(id);
         }
 
-        public static void updateTaskPrompt(ToDoList list)
+        public static void UpdateTaskPrompt(ToDoList list)
         {
             Console.WriteLine("Enter task id:");
             int id = Convert.ToInt32(Console.ReadLine());
@@ -87,14 +86,14 @@ namespace IntroToC_
             string name = Console.ReadLine();
             Console.WriteLine("Enter new task description:");
             string description = Console.ReadLine();
-            list.updateTask(id, name, description);
+            list.UpdateTask(id, name, description);
         }
 
-        public static void markTaskCompletedPrompt(ToDoList list)
+        public static void MarkTaskCompletedPrompt(ToDoList list)
         {
             Console.WriteLine("Enter task id:");
             int id = Convert.ToInt32(Console.ReadLine());
-            list.markTaskCompleted(id);
+            list.MarkTaskCompleted(id);
         }
     }
 }
