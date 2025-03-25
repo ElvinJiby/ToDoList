@@ -2,11 +2,20 @@ namespace IntroToC_
 {
     public class ToDoList
     {
-        public List<Task> Tasks { get; } = [];
+        public List<Task> Tasks { get; set; } = new List<Task>();
         public int Size { get; private set; } = 0;
 
         public void AddTask(string name, string description)
         {
+            if (String.IsNullOrEmpty(name))
+            {
+                Console.WriteLine("Name cannot be empty."); return;
+            }
+            if (String.IsNullOrEmpty(description))
+            {
+                Console.WriteLine("Description cannot be empty."); return;
+            }
+
             Task task = new(Size + 1, name, description);
             if (Tasks.Contains(task))
             {
@@ -30,6 +39,14 @@ namespace IntroToC_
         }
         public void UpdateTask(int id, string name, string description)
         {
+            if (String.IsNullOrEmpty(name))
+            {
+                Console.WriteLine("Name cannot be empty."); return;
+            }
+            if (String.IsNullOrEmpty(description))
+            {
+                Console.WriteLine("Description cannot be empty."); return;
+            }
             if (id > Size || id < 1)
             {
                 Console.WriteLine("Invalid task id.");
