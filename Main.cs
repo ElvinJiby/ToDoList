@@ -11,26 +11,30 @@ namespace IntroToC_
 
             while (!exit)
             {
+                Console.Clear();
                 DisplayList(list);
                 Console.WriteLine("__________________________________________________\n");
                 exit = PrintPrompt(ref list);
             }
         }
+
+        // Utility
         public static void DisplayList(ToDoList list)
         {
             if (list.IsEmpty())
             {
-                Console.WriteLine("No tasks in the list. Try adding some!");
+                Console.WriteLine("\nNo tasks in the list. Try adding some!");
                 return;
             }
 
-            Console.WriteLine("Tasks in the list:");
+            Console.WriteLine("\nTasks in the list:");
             foreach (var item in list.Tasks)
             {
                 Console.WriteLine(item.Id + ". " + item.Name);
                 Console.WriteLine("\t" + item.Description);
-                if (item.IsCompleted) Console.WriteLine("\tCompleted");
-                else Console.WriteLine("\tNot completed\n");
+                Console.Write("\tStatus: ");
+                if (item.IsCompleted) Console.WriteLine("Completed");
+                else Console.WriteLine("Not completed\n");
             }
         }
 
@@ -43,15 +47,13 @@ namespace IntroToC_
             Console.WriteLine("5. Clear list");
             Console.WriteLine("6. Load task list from a file");
             Console.WriteLine("7. Save task list to a file");
-            Console.WriteLine("8. Exit");
+            Console.WriteLine("8. Exit\n");
 
-            Console.WriteLine("Enter your choice:");
-            int choice = Convert.ToInt32(Console.ReadLine());
+            int choice = GetValidIntInput("Enter your choice: ");
 
             while (choice < 1 || choice > 8)
             {
-                Console.WriteLine("Invalid choice. Please try again.");
-                choice = Convert.ToInt32(Console.ReadLine());
+                choice = GetValidIntInput("Invalid choice. Please try again.");
             }
 
             switch (choice)
@@ -70,69 +72,111 @@ namespace IntroToC_
 
         public static void AddTaskPrompt(ToDoList list)
         {
-            Console.WriteLine("Enter task name:");
-            string name = Console.ReadLine();
-            Console.WriteLine("Enter task description:");
-            string description = Console.ReadLine();
+            string name = GetValidStringInput("Enter task name:");
+            string description = GetValidStringInput("Enter task description:");
             list.AddTask(name, description);
         }
 
         public static void RemoveTaskPrompt(ToDoList list)
         {
-            Console.WriteLine("Enter task id:");
-            int id = Convert.ToInt32(Console.ReadLine());
-            list.RemoveTask(id);
+            try { list.RemoveTask(GetValidIntInput("Enter task id:")); }
+            catch (Exception e) { Console.WriteLine($"{e.Message}"); }
         }
 
         public static void UpdateTaskPrompt(ToDoList list)
         {
-            Console.WriteLine("Enter task id:");
-            int id = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Enter new task name:");
-            string name = Console.ReadLine();
-            Console.WriteLine("Enter new task description:");
-            string description = Console.ReadLine();
-            list.UpdateTask(id, name, description);
+            int id = GetValidIntInput("Enter task id:");
+            string name = GetValidStringInput("Enter new task name:");
+            string description = GetValidStringInput("Enter new task description:");
+            try { list.UpdateTask(id, name, description); }
+            catch (Exception e) { Console.WriteLine($"{e.Message}"); }
         }
 
         public static void MarkTaskCompletedPrompt(ToDoList list)
         {
-            Console.WriteLine("Enter task id:");
-            int id = Convert.ToInt32(Console.ReadLine());
-            list.MarkTaskCompleted(id);
+            try { list.MarkTaskCompleted(GetValidIntInput("Enter task id:")); }
+            catch (Exception e) { Console.WriteLine($"{e.Message}"); }
         }
 
         public static void LoadListFromFile(ref ToDoList list)
         {
-            Console.WriteLine("Enter the path of the Json file (with .json):");
-            string filePath = Console.ReadLine();
+            string filePath = GetValidStringInput("Enter the path of the Json file (with .json):");
+            if (!filePath.Contains(".json"))
+            {
+                ToDoList.PrintMSG("Invalid file path. File must have a .json file extension.");
+            }
             if (!File.Exists(filePath))
             {
-                Console.WriteLine("File not found."); 
+                ToDoList.PrintMSG("File not found."); 
                 return;
             }
 
-            string jsonString = File.ReadAllText(filePath);
-            list = JsonSerializer.Deserialize<ToDoList>(jsonString);
-            
-            Console.WriteLine(list);
-            Console.WriteLine($"List loaded successfully from: {filePath}");
+            try
+            {
+                string jsonString = File.ReadAllText(filePath);
+                ToDoList? newlist = JsonSerializer.Deserialize<ToDoList>(jsonString);
+                if (newlist == null)
+                {
+                    ToDoList.PrintMSG("Error: Unable to deserialise Json file.");
+                    return;
+                }
+
+                list = newlist;
+                ToDoList.PrintMSG($"List loaded successfully from: {filePath}");
+            }
+            catch (Exception e)
+            {
+                ToDoList.PrintMSG($"Error while parsing: {e.Message}");
+            }
         }
+
         public static void SaveListToFile(ToDoList list)
         {
             if (list.Size == 0)
             {
-                Console.WriteLine("You have no list to save.");
+                ToDoList.PrintMSG("Cannot save an empty list.");
                 return;
             }
-            Console.WriteLine("Enter a name for the file (without .json):");
-            string fileName = Console.ReadLine();
+            string fileName = GetValidStringInput("Enter a name for the file (without .json):");
             string filePath = $"{fileName}.json";
 
-            string jsonString = JsonSerializer.Serialize(list);
-            File.WriteAllText(filePath, jsonString);
+            try
+            {
+                string jsonString = JsonSerializer.Serialize(list);
+                File.WriteAllText(filePath, jsonString);
+                
+                ToDoList.PrintMSG($"File saved at: {filePath}");
+            }
+            catch (Exception e)
+            {
+                ToDoList.PrintMSG($"Error: {e.Message}");
+            }
 
-            Console.WriteLine($"File saved at: {filePath}");
+        }
+
+        // Input validation
+        public static int GetValidIntInput(string prompt)
+        {
+            int result;
+            Console.WriteLine(prompt);
+            while (!int.TryParse(Console.ReadLine(), out result))
+            {
+                Console.WriteLine("Invalid input. Please enter a number.");
+            }
+            return result;
+        }
+
+        public static string GetValidStringInput(string prompt)
+        {
+            string? result;
+            Console.WriteLine(prompt);
+            while (true)
+            {
+                result = Console.ReadLine();
+                if (!string.IsNullOrEmpty(result)) break;
+                else Console.WriteLine("Input cannot be empty. Please enter a non-empty string.");
+            }
+            return result;
         }
     }
 }
